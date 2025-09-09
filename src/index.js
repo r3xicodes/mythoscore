@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { config } from './config.js';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';   // ✅ needed for Windows-safe dynamic imports
 
 if (!config.token || !config.clientId || !config.mongoUri) {
   console.error('Missing required env vars. Check .env');
@@ -18,7 +19,8 @@ for (const folder of fs.readdirSync(commandsPath)) {
   const folderPath = path.join(commandsPath, folder);
   for (const file of fs.readdirSync(folderPath)) {
     if (!file.endsWith('.js')) continue;
-    const cmd = (await import(path.join(folderPath, file))).default;
+    const cmdPath = path.join(folderPath, file);
+    const cmd = (await import(pathToFileURL(cmdPath).href)).default; // ✅ convert to file:// URL
     client.commands.set(cmd.data.name, cmd);
   }
 }
@@ -42,9 +44,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
   } catch (err) {
     console.error(err);
     if (interaction.deferred || interaction.replied) {
-      await interaction.followUp({ content: '⚠️ Oops, something went wrong.', ephemeral: true });
+      await interaction.followUp({
+        content: '⚠️ Oops, something went wrong.',
+        ephemeral: true,
+      });
     } else {
-      await interaction.reply({ content: '⚠️ Oops, something went wrong.', ephemeral: true });
+      await interaction.reply({
+        content: '⚠️ Oops, something went wrong.',
+        ephemeral: true,
+      });
     }
   }
 });

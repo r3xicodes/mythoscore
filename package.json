@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "D&D-inspired Discord bot with embeds, character sheets, inventory, lore, and stealth rigging.",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "deploy": "node src/deploy-commands.js"
