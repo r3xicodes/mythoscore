@@ -5,6 +5,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';   // ✅ needed for Windows-safe dynamic imports
 
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
+
 if (!config.token || !config.clientId || !config.mongoUri) {
   console.error('Missing required env vars. Check .env');
   process.exit(1);
