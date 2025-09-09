@@ -1,0 +1,19 @@
+{
+  "name": "mythoscore",
+  "version": "1.0.0",
+  "description": "D&D-inspired Discord bot with embeds, character sheets, inventory, lore, and stealth rigging.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.6.0"
+  }
+}
