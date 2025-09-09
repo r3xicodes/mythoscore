@@ -11,8 +11,9 @@ export default {
     .addStringOption(o => o.setName('class').setDescription('New class').addChoices(...DEFAULT_CLASSES.map(c=>({name:c,value:c})), {name:'Custom…',value:'custom'}))
     .addIntegerOption(o => o.setName('level').setDescription('New level (1-20)').setMinValue(1).setMaxValue(20)),
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     const doc = await Character.findOne({ userId: interaction.user.id });
-    if (!doc) return interaction.reply({ content: 'Create a character first with /createcharacter.', ephemeral: true });
+    if (!doc) return interaction.editReply({ content: 'Create a character first with /createcharacter.' });
 
     const name = interaction.options.getString('name');
     let race = interaction.options.getString('race');
@@ -20,12 +21,12 @@ export default {
     const level = interaction.options.getInteger('level');
 
     if (race === 'custom') {
-      await interaction.reply({ content: 'Custom race name? (30s)…', ephemeral: true });
+      await interaction.editReply({ content: 'Custom race name? (30s)…' });
       const collected = await interaction.channel.awaitMessages({ max: 1, time: 30000, filter: m => m.author.id === interaction.user.id });
       race = collected.first()?.content?.slice(0,50) || doc.race;
     }
     if (klass === 'custom') {
-      await interaction.followUp({ content: 'Custom class name? (30s)…', ephemeral: true });
+      await interaction.followUp({ content: 'Custom class name? (30s)…' });
       const collected2 = await interaction.channel.awaitMessages({ max: 1, time: 30000, filter: m => m.author.id === interaction.user.id });
       klass = collected2.first()?.content?.slice(0,50) || doc.class;
     }
@@ -36,6 +37,6 @@ export default {
     if (typeof level === 'number') doc.level = level;
 
     await doc.save();
-    return interaction.reply({ content: '✅ Character updated. Use /viewcharacter to see changes.', ephemeral: true });
+    return interaction.editReply({ content: '✅ Character updated. Use /viewcharacter to see changes.' });
   }
 };

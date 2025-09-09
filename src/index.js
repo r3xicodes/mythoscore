@@ -27,12 +27,14 @@ for (const folder of fs.readdirSync(commandsPath)) {
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`✅ Logged in as ${c.user.tag}`);
-  try {
-    await mongoose.connect(config.mongoUri);
-    console.log('✅ MongoDB connected');
-  } catch (e) {
-    console.error('MongoDB connection error:', e);
-  }
+  // MongoDB connection (uncomment when ready)
+  // try {
+  //   await mongoose.connect(config.mongoUri);
+  //   console.log('✅ MongoDB connected');
+  // } catch (e) {
+  //   console.error('MongoDB connection error:', e);
+  // }
+  // If you see 'MongoDB connection error: Error: querySrv ENOTFOUND', check your .env for a valid MONGODB_URI.
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {

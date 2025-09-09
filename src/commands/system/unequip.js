@@ -9,11 +9,12 @@ export default {
     .addStringOption(o => o.setName('slot').setDescription('Slot').setRequired(true)
       .addChoices(...EQUIP_SLOTS.map(s=>({ name: s, value: s })))),
   async execute(interaction) {
-    const slot = interaction.options.getString('slot');
-    const charDoc = await Character.findOne({ userId: interaction.user.id });
-    if (!charDoc) return interaction.reply({ content: 'Create a character first.', ephemeral: true });
-    charDoc.equipped[slot] = null;
-    await charDoc.save();
-    return interaction.reply({ content: `✅ Unequipped **${slot}**.`, ephemeral: true });
+  await interaction.deferReply({ ephemeral: true });
+  const slot = interaction.options.getString('slot');
+  const charDoc = await Character.findOne({ userId: interaction.user.id });
+  if (!charDoc) return interaction.editReply({ content: 'Create a character first.' });
+  charDoc.equipped[slot] = null;
+  await charDoc.save();
+  return interaction.editReply({ content: `✅ Unequipped **${slot}**.` });
   }
 };

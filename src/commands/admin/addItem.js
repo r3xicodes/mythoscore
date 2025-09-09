@@ -20,20 +20,21 @@ export default {
         {name:'common',value:'common'},{name:'uncommon',value:'uncommon'},{name:'rare',value:'rare'},{name:'epic',value:'epic'},{name:'legendary',value:'legendary'}))
     .addStringOption(o=>o.setName('effects').setDescription('Effects/notes')),
   async execute(interaction) {
-    const user = interaction.options.getUser('user');
-    const name = interaction.options.getString('name');
-    const slot = interaction.options.getString('slot');
-    const type = interaction.options.getString('type');
-    const rarity = interaction.options.getString('rarity');
-    const effects = interaction.options.getString('effects') || '';
+  await interaction.deferReply({ ephemeral: true });
+  const user = interaction.options.getUser('user');
+  const name = interaction.options.getString('name');
+  const slot = interaction.options.getString('slot');
+  const type = interaction.options.getString('type');
+  const rarity = interaction.options.getString('rarity');
+  const effects = interaction.options.getString('effects') || '';
 
-    const charDoc = await Character.findOne({ userId: user.id });
-    if (!charDoc) return interaction.reply({ content: 'Target has no character.', ephemeral: true });
+  const charDoc = await Character.findOne({ userId: user.id });
+  if (!charDoc) return interaction.editReply({ content: 'Target has no character.' });
 
-    const item = await Item.create({ name, slot, type, rarity, effects, ownerUserId: user.id });
-    charDoc.inventory.push(item._id);
-    await charDoc.save();
+  const item = await Item.create({ name, slot, type, rarity, effects, ownerUserId: user.id });
+  charDoc.inventory.push(item._id);
+  await charDoc.save();
 
-    return interaction.reply({ content: `✅ Added **${name}** [${rarity}] (${slot}) to <@${user.id}>.`, ephemeral: true });
+  return interaction.editReply({ content: `✅ Added **${name}** [${rarity}] (${slot}) to <@${user.id}>.` });
   }
 };

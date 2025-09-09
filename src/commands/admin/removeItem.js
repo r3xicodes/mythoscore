@@ -9,14 +9,15 @@ export default {
     .addUserOption(o=>o.setName('user').setDescription('Target user').setRequired(true))
     .addStringOption(o=>o.setName('name').setDescription('Item name').setRequired(true)),
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     const user = interaction.options.getUser('user');
     const name = interaction.options.getString('name');
 
     const charDoc = await Character.findOne({ userId: user.id }).populate('inventory');
-    if (!charDoc) return interaction.reply({ content: 'Target has no character.', ephemeral: true });
+    if (!charDoc) return interaction.editReply({ content: 'Target has no character.' });
 
     const idx = charDoc.inventory.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
-    if (idx === -1) return interaction.reply({ content: 'Item not found.', ephemeral: true });
+    if (idx === -1) return interaction.editReply({ content: 'Item not found.' });
 
     const [removed] = charDoc.inventory.splice(idx,1);
     // Also unequip if equipped
@@ -27,6 +28,6 @@ export default {
     }
     await charDoc.save();
 
-    return interaction.reply({ content: `🗑️ Removed **${removed.name}** from <@${user.id}>.`, ephemeral: true });
+    return interaction.editReply({ content: `🗑️ Removed **${removed.name}** from <@${user.id}>.` });
   }
 };

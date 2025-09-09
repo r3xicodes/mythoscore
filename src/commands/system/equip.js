@@ -11,20 +11,21 @@ export default {
     .addStringOption(o => o.setName('slot').setDescription('Slot').setRequired(true)
       .addChoices(...EQUIP_SLOTS.map(s=>({ name: s, value: s })))),
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     const itemName = interaction.options.getString('item');
     const slot = interaction.options.getString('slot');
 
     const charDoc = await Character.findOne({ userId: interaction.user.id }).populate('inventory');
-    if (!charDoc) return interaction.reply({ content: 'Create a character first.', ephemeral: true });
+    if (!charDoc) return interaction.editReply({ content: 'Create a character first.' });
 
     const item = charDoc.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
-    if (!item) return interaction.reply({ content: 'Item not found in your inventory.', ephemeral: true });
+    if (!item) return interaction.editReply({ content: 'Item not found in your inventory.' });
     if (item.slot !== slot && item.slot !== 'none') {
-      return interaction.reply({ content: `That item is not compatible with **${slot}** (item slot: ${item.slot}).`, ephemeral: true });
+      return interaction.editReply({ content: `That item is not compatible with **${slot}** (item slot: ${item.slot}).` });
     }
 
     charDoc.equipped[slot] = item._id;
     await charDoc.save();
-    return interaction.reply({ content: `✅ Equipped **${item.name}** to **${slot}**.`, ephemeral: true });
+    return interaction.editReply({ content: `✅ Equipped **${item.name}** to **${slot}**.` });
   }
 };

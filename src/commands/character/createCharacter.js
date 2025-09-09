@@ -13,18 +13,19 @@ export default {
       .addChoices(...DEFAULT_CLASSES.map(c => ({ name: c, value: c })), { name: 'Custom…', value: 'custom' }))
     .addStringOption(o => o.setName('languages').setDescription('Comma-separated languages (or "default")').setRequired(false)),
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     const name = interaction.options.getString('name');
     let race = interaction.options.getString('race');
     let klass = interaction.options.getString('class');
     const langsInput = interaction.options.getString('languages');
 
     if (race === 'custom') {
-      await interaction.reply({ content: 'Please reply with your custom race name (30s)…', ephemeral: true });
+      await interaction.editReply({ content: 'Please reply with your custom race name (30s)…' });
       const collected = await interaction.channel.awaitMessages({ max: 1, time: 30000, filter: m => m.author.id === interaction.user.id });
       race = collected.first()?.content?.slice(0, 50) || 'Traveler';
     }
     if (klass === 'custom') {
-      await interaction.followUp({ content: 'Custom class name? (30s)…', ephemeral: true });
+      await interaction.followUp({ content: 'Custom class name? (30s)…' });
       const collected2 = await interaction.channel.awaitMessages({ max: 1, time: 30000, filter: m => m.author.id === interaction.user.id });
       klass = collected2.first()?.content?.slice(0, 50) || 'Adventurer';
     }
@@ -34,9 +35,9 @@ export default {
       : langsInput.split(',').map(s => s.trim()).filter(Boolean).slice(0, 6);
 
     const existing = await Character.findOne({ userId: interaction.user.id });
-    if (existing) return interaction.reply({ content: 'You already have a character. Use /editcharacter or /deletecharacter first.', ephemeral: true });
+    if (existing) return interaction.editReply({ content: 'You already have a character. Use /editcharacter or /deletecharacter first.' });
 
     const charDoc = await Character.create({ userId: interaction.user.id, name, race, class: klass, languages });
-    return interaction.reply({ content: `✅ Created **${name}** (${race} ${klass}). Use /viewcharacter to see your sheet.`, ephemeral: true });
+    return interaction.editReply({ content: `✅ Created **${name}** (${race} ${klass}). Use /viewcharacter to see your sheet.` });
   }
 };
